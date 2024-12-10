@@ -1,101 +1,62 @@
 import React, { useState } from "react";
+import Navbar from "./Components/Navbar";
+import ConfigurationForm from "./Components/ConfigurationForm";
+import Controls from "./Components/Controls";
+import SystemLog from "./Components/SystemLog";
 import "./App.css";
-import ParameterInput from "./Components/ParameterInput";
 
 function App() {
-const [logs, setLogs] = useState(["No logs available yet..."]);
-const [socket, setSocket] = useState(null);
+  const [config, setConfig] = useState({
+    totalTickets: "",
+    ticketReleaseRate: "",
+    customerRetrievalRate: "",
+    vendorCount: "",
+  });
 
-const handleStartProcess = (e) => {
-  e.preventDefault();
+  const [logs, setLogs] = useState([]);
+  const [isRunning, setIsRunning] = useState(false);
 
-  const formData = new FormData(e.target);
-  const numTickets = formData.get("totalTickets");
-  const releaseRate = formData.get("releaseRate");
-  const retrievalRate = formData.get("retrievalRate");
-  const ticketCapacity = formData.get("maxCapacity");
+  const handleStart = () => {
+    if (
+      !config.totalTickets ||
+      !config.ticketReleaseRate ||
+      !config.customerRetrievalRate ||
+      !config.vendorCount
+    ) {
+      alert("Please fill all fields with positive numbers.");
+      return;
+    }
+    setIsRunning(true);
+    logMessage(
+      `Ticket Exchange initialized. Total Tickets: ${config.totalTickets}, Release Rate: ${config.ticketReleaseRate}/min, Retrieval Rate: ${config.customerRetrievalRate}/min, Max Ticket Count: ${config.maxTicketCount}`
+    );
+  };
 
-  const command = `START ${numTickets} ${releaseRate} ${retrievalRate} ${ticketCapacity}`;
+  const handleStop = () => {
+    setIsRunning(false);
+    logMessage("Simulation halted. System resources released.");
+  };
 
-  if (socket && socket.readyState === WebSocket.OPEN) {
-    socket.send(command); // Send the START command if socket is open
-  } else {
-    const newSocket = new WebSocket("ws://localhost:8080/ws");
-    setSocket(newSocket);
+  const logMessage = (message) => {
+    const timestamp = new Date().toLocaleTimeString();
+    setLogs((prevLogs) => [`[${timestamp}] ${message}`, ...prevLogs]);
+  };
 
-    newSocket.onopen = () => {
-      newSocket.send(command); // Send START command on connection open
-      console.log("WebSocket connection established.");
-    };
+  const updateConfig = (field, value) => {
+    setConfig((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
-    newSocket.onmessage = (event) => {
-      setLogs((prevLogs) => [...prevLogs, event.data]); // Append logs
-    };
+  return (
+      <div className="content">
+      <h1 className="page-title">Real-Time Event Ticketing System</h1>
 
-    newSocket.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-
-    newSocket.onclose = () => {
-      console.log("WebSocket connection closed.");
-    };
-  }
-};
-
-const handleStopProcess = () => {
-  if (socket) {
-    socket.send("STOP"); // Send STOP command
-    socket.close(); // Close the WebSocket connection
-    setSocket(null);
-    setLogs((prevLogs) => [...prevLogs, "Simulation stopped."]);
-  }
-};
-
-return (
-  <div className="App">
-    {/* <h1>Create Configuration</h1>
-    <form onSubmit={handleStartProcess}>
-      <div>
-        <label>Total Tickets:</label>
-        <input type="number" name="totalTickets" required />
+        <ConfigurationForm config={config} updateConfig={updateConfig} />
+        <Controls onStart={handleStart} onStop={handleStop} isRunning={isRunning} />
+        <SystemLog logs={logs} />
       </div>
-      <div>
-        <label>Ticket Release Rate:</label>
-        <input type="number" name="releaseRate" required />
-      </div>
-      <div>
-        <label>Customer Retrieval Rate:</label>
-        <input type="number" name="retrievalRate" required />
-      </div>
-      <div>
-        <label>Max Ticket Capacity:</label>
-        <input type="number" name="maxCapacity" required />
-      </div>
-      <div>
-        <button type="submit" style={{ backgroundColor: "orange" }}>
-          Start Process
-        </button>
-        <button
-          type="button"
-          onClick={handleStopProcess}
-          style={{ backgroundColor: "red" }}
-        >
-          Stop Process
-        </button>
-      </div>
-    </form>
-    <div>
-      <h2>Logs</h2>
-      <textarea
-        readOnly
-        value={logs.join("\n")}
-        style={{ width: "100%", height: "200px" }}
-      />
-    </div> */}
-    <div>
-      <ParameterInput/>
-    </div>
-  </div>
   );
 }
 
