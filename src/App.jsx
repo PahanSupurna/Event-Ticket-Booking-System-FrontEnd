@@ -14,6 +14,7 @@ function App() {
   });
 
   const [logs, setLogs] = useState([]);
+  const [output, setOutput] = useState(""); 
   const [isRunning, setIsRunning] = useState(false);
 
   const handleStart = () => {
@@ -55,7 +56,7 @@ function App() {
 
         <ConfigurationForm config={config} updateConfig={updateConfig} />
         <Controls onStart={handleStart} onStop={handleStop} isRunning={isRunning} />
-        <SystemLog logs={logs} />
+        <SystemLog logs={logs} output={output} />
       </div>
   );
 }

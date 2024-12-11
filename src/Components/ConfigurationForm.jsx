@@ -60,7 +60,9 @@ const ConfigurationForm = ({ config, updateConfig }) => {
           placeholder="Please enter the inputs here..."
         />
       </label>
-      <button type="submit">Save Configuration</button>
+      <div class = "configButton">
+        <button type="submit">Save Configuration</button>
+      </div>
     </form>
   );
 };
