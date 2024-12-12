@@ -15,9 +15,8 @@ const SystemLog = ({ logs, output }) => {
         </ul>
       </div>
       <div className="output-box">
-        {output || "No output available"}
+        {output || "No output available"}</div>
       </div>
-    </div>
   );
 };
 
