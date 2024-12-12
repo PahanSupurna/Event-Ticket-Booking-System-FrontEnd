@@ -1,6 +1,6 @@
 --Real-Time Event Ticketing System-- 
   Introduction 
-    • The Real-Time Event Ticketing System is a web application built using React for the 
+    -The Real-Time Event Ticketing System is a web application built using React for the 
     frontend and Spring Boot for the backend. The system simulates a real-time ticket 
     booking process where vendors add tickets to a pool and customers purchase tickets from 
     the pool. The application ensures that the number of tickets in the system does not exceed 
